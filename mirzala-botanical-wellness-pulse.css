@@ -1,3 +1,15 @@
+/* Sayfadaki tüm standart Blogger/site öğelerini sertçe gizle */
+body > *:not(#curated-standalone) {
+  display: none !important;
+}
+
+html, body {
+  margin: 0 !important;
+  padding: 0 !important;
+  overflow: hidden !important;
+  background: #0b0f19 !important;
+}
+
 header, footer, aside, nav,
 .sidebar, #sidebar, .sidebar-container,
 .post-title, .entry-title, .post-header, .post-footer,
