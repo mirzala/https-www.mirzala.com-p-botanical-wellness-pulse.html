@@ -1,4 +1,14 @@
 (function() {
+  // HTML içine div koyma derdine son: Kök alanı kod kendisi üretir ve body'ye basar
+  if (!document.getElementById('mirzala-curated-root')) {
+    var autoRoot = document.createElement('div');
+    autoRoot.id = 'mirzala-curated-root';
+    document.body.appendChild(autoRoot);
+  }
+  
+  // ... (Geri kalan tüm ürün motoru kodların burada devam eder)
+
+(function() {
   var MIRZALA_PRODUCTS = [
     {
       image: "https://images-na.ssl-images-amazon.com/images/P/B0CMS5WTG4.jpg",
