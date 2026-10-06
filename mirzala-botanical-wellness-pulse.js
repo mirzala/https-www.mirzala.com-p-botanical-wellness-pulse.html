@@ -1,742 +1,437 @@
 (function () {
-
-  'use strict';
-
+  "use strict";
 
   /* =========================================================
-     PAGE CONTROL
+     MIRZALA PULSE
+     TARGET PAGE:
+     /p/new-new-new.html
      ========================================================= */
 
-  var path = window.location.pathname.toLowerCase();
+  var TARGET_PATH = "/p/new-new-new.html";
 
-  var isCurated =
-    path === '/p/botanical-wellness.html' ||
-    path.indexOf('/p/botanical-wellness.html') !== -1 ||
-    path.indexOf('botanical-wellness-pulse') !== -1 ||
-    path.indexOf('oil-product') !== -1;
+  var currentPath = window.location.pathname
+    .toLowerCase()
+    .replace(/\/+$/, "");
 
-  if (!isCurated) {
+  if (currentPath !== TARGET_PATH) {
     return;
   }
 
+  /* =========================================================
+     SETTINGS
+     ========================================================= */
+
+  var JSON_URL = "";
+
+  var FALLBACK_IMG =
+    "https://via.placeholder.com/800x800.png?text=Mirzala";
 
   /* =========================================================
      PRODUCT DATABASE
      ========================================================= */
 
-  var MIRZALA_PRODUCTS = [
-
+  var products = [
     {
-      image:
-        "https://images-na.ssl-images-amazon.com/images/P/B0CMS5WTG4.jpg",
-
-      title:
-        "Secret Roll-On Powder Fresh, 1.8 oz (12-Pack)",
-
+      id: "product-1",
+      title: "Botanical Wellness Product",
       description:
-        "Bring a fresh, uplifting scent into your home with 100% pure botanical and wellness care oils. Steam distilled and ready to transform your daily routine.",
-
-      url:
-        "https://www.amazon.com/dp/B0CMS5WTG4"
+        "Discover a carefully selected wellness product through Mirzala Pulse.",
+      image: FALLBACK_IMG,
+      price: "",
+      category: "Wellness",
+      url: "https://www.amazon.com/",
+      affiliate: true
     },
 
     {
-      image:
-        "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=600&auto=format&fit=crop&q=60",
-
-      title:
-        "Botanical Essential Care Oil",
-
+      id: "product-2",
+      title: "Premium Wellness Selection",
       description:
-        "Natural hair and body care essentials designed for your daily organic rituals.",
-
-      url:
-        "https://www.amazon.com/dp/XXXXXXXXXX"
+        "Explore another carefully selected product from the Mirzala discovery feed.",
+      image: FALLBACK_IMG,
+      price: "",
+      category: "Wellness",
+      url: "https://www.amazon.com/",
+      affiliate: true
     }
-
   ];
 
-
   /* =========================================================
-     OPTIONAL JSON DATABASE
+     ROOT
      ========================================================= */
 
-  var JSON_URL = '';
+  function createRoot() {
 
-  var FALLBACK_IMG =
-    "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=600&auto=format&fit=crop&q=60";
+    var oldRoot = document.getElementById("curated-standalone");
 
+    if (oldRoot) {
+      oldRoot.remove();
+    }
 
-  /* =========================================================
-     CREATE ROOT
-     ========================================================= */
+    var root = document.createElement("div");
 
-  if (document.getElementById('curated-standalone')) {
-    return;
-  }
+    root.id = "curated-standalone";
 
+    root.innerHTML = `
+      <div id="curated-stage">
 
-  var root = document.createElement('div');
+        <header id="curated-header">
 
-  root.id = 'curated-standalone';
-
-
-  root.innerHTML = `
-
-    <div id="curated-stage">
-
-      <!-- HOME -->
-
-      <button
-        id="curated-home-btn"
-        title="Home"
-        aria-label="Home">
-
-        <svg viewBox="0 0 24 24">
-          <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/>
-        </svg>
-
-      </button>
-
-
-      <!-- TOUCH AREA -->
-
-      <div id="curated-touch-shield"></div>
-
-
-      <!-- HEADER -->
-
-      <div class="curated-card-header">
-
-        <span class="curated-brand-logo">
-          MIRZALA PULSE
-        </span>
-
-        <span class="curated-sponsored-text">
-          Sponsored
-        </span>
-
-      </div>
-
-
-      <!-- PRODUCT IMAGE -->
-
-      <div class="curated-image-wrapper">
-
-        <div class="curated-image-container">
-
-          <img
-            id="curated-img"
-            src=""
-            alt="Product">
-
-        </div>
-
-      </div>
-
-
-      <!-- CONTENT -->
-
-      <div class="curated-content">
-
-
-        <!-- NAVIGATION -->
-
-        <div
-          class="curated-nav"
-          id="curated-nav">
-
+          <div id="curated-brand">
+            <span class="curated-logo">MIRZALA</span>
+            <span class="curated-label">PULSE</span>
+          </div>
 
           <button
-            class="curated-nav-btn"
-            id="ctrl-up"
-            title="Previous Product"
-            aria-label="Previous Product">
-
-            <svg viewBox="0 0 24 24">
-              <path d="M6.5 14.5 12 9l5.5 5.5"/>
-            </svg>
-
-          </button>
-
-
-          <!-- SHARE -->
-
-          <button
-            id="curated-share-btn"
-            class="curated-share-btn"
-            title="Share"
+            id="curated-share"
+            type="button"
             aria-label="Share">
-
-            <svg viewBox="0 0 24 24">
-
-              <circle
-                cx="18"
-                cy="5"
-                r="2.5"/>
-
-              <circle
-                cx="6"
-                cy="12"
-                r="2.5"/>
-
-              <circle
-                cx="18"
-                cy="19"
-                r="2.5"/>
-
-              <path
-                d="m8.2 10.9 7.5-4.2M8.2 13.1l7.5 4.2"/>
-
-            </svg>
-
+            ↗
           </button>
 
+        </header>
 
-          <!-- NEXT -->
+
+        <div id="curated-sponsored">
+          SPONSORED
+        </div>
+
+
+        <main id="curated-content">
+
+          <div id="curated-image-wrap">
+
+            <img
+              id="curated-product-image"
+              src="${FALLBACK_IMG}"
+              alt="Mirzala Pulse product"
+            />
+
+          </div>
+
+
+          <div id="curated-info">
+
+            <div id="curated-category">
+              WELLNESS
+            </div>
+
+            <h1 id="curated-title">
+              Mirzala Pulse
+            </h1>
+
+            <p id="curated-description">
+              Discover carefully selected products.
+            </p>
+
+            <div id="curated-price"></div>
+
+            <a
+              id="curated-cta"
+              href="#"
+              target="_blank"
+              rel="nofollow sponsored noopener">
+              VIEW PRODUCT
+            </a>
+
+          </div>
+
+        </main>
+
+
+        <div id="curated-disclosure">
+          As an affiliate, Mirzala may earn a commission from qualifying purchases.
+        </div>
+
+
+        <nav id="curated-nav">
 
           <button
-            class="curated-nav-btn"
-            id="ctrl-down"
-            title="Next Product"
-            aria-label="Next Product">
-
-            <svg viewBox="0 0 24 24">
-              <path d="m6.5 9.5 5.5 5.5 5.5-5.5"/>
-            </svg>
-
+            id="curated-prev"
+            type="button"
+            aria-label="Previous product">
+            ↑
           </button>
 
-        </div>
+          <div id="curated-counter">
+            1 / 1
+          </div>
+
+          <button
+            id="curated-next"
+            type="button"
+            aria-label="Next product">
+            ↓
+          </button>
+
+        </nav>
 
 
-        <!-- TITLE -->
-
-        <h2
-          class="curated-title"
-          id="curated-title">
-
-          Loading Botanical Essentials...
-
-        </h2>
-
-
-        <!-- DESCRIPTION -->
-
-        <p
-          class="curated-description"
-          id="curated-desc">
-
-          Please wait while we load the collection...
-
-        </p>
-
-      </div>
-
-
-      <!-- BOTTOM -->
-
-      <div class="curated-bottom-group">
-
-
-        <!-- CTA -->
-
-        <div class="curated-cta-container">
-
-          <a
-            id="curated-link"
-            href="#"
-            class="curated-cta-button"
-            target="_blank"
-            rel="nofollow sponsored noopener">
-
-            Check It Out ➔
-
-          </a>
-
-        </div>
-
-
-        <!-- DISCLOSURE -->
-
-        <div class="curated-ftc-disclosure">
-
-          <span class="disclosure-star">*</span>
-
-          mirzala is reader-supported. We may earn a commission from qualifying purchases.
-
-          <a
-            href="/p/affiliate-disclosure.html"
-            target="_blank"
-            rel="noopener">
-
-            Affiliate Disclosure
-
-          </a>.
-
-        </div>
-
-      </div>
-
-
-      <!-- SHARE OVERLAY -->
-
-      <div
-        id="curated-share-overlay"
-        aria-hidden="true">
+        <button
+          id="curated-home"
+          type="button"
+          aria-label="Home">
+          MIRZALA
+        </button>
 
 
         <div
-          class="curated-share-sheet"
-          role="dialog"
-          aria-label="Share product">
+          id="curated-share-panel"
+          aria-hidden="true">
 
-
-          <div class="curated-share-top">
-
-            <span class="curated-share-heading">
-              Share this selection
-            </span>
-
+          <div class="curated-share-box">
 
             <button
-              class="curated-share-close"
               id="curated-share-close"
+              type="button"
               aria-label="Close">
-
-              <svg viewBox="0 0 24 24">
-                <path d="M6 6l12 12M18 6 6 18"/>
-              </svg>
-
+              ×
             </button>
 
-          </div>
-
-
-          <div class="curated-share-options">
-
-
-            <!-- WHATSAPP -->
+            <h2>Share this product</h2>
 
             <button
-              class="curated-share-option"
-              data-share="whatsapp"
+              id="curated-whatsapp"
               type="button">
-
-              <svg viewBox="0 0 24 24">
-
-                <path
-                  d="M20 11.5a8 8 0 0 1-11.8 7L4 20l1.5-4A8 8 0 1 1 20 11.5Z"/>
-
-                <path
-                  d="M8.7 8.4c.2-.4.4-.4.7-.4h.5c.2 0 .4.1.5.4l.7 1.7c.1.2.1.4-.1.6l-.5.6c-.1.1-.1.3 0 .5.5.9 1.2 1.6 2.1 2.1.2.1.4.1.5 0l.7-.5c.2-.2.4-.2.6-.1l1.6.7c.2.1.4.3.4.5v.5c0 .3-.1.5-.4.7-.4.3-1 .4-1.5.2-2.6-.8-4.6-2.8-5.4-5.4-.2-.5-.1-1.1.1-1.6Z"/>
-
-              </svg>
-
-              <span>
-                WhatsApp
-              </span>
-
+              WhatsApp
             </button>
-
-
-            <!-- COPY -->
 
             <button
-              class="curated-share-option"
-              data-share="copy"
+              id="curated-copy"
               type="button">
-
-              <svg viewBox="0 0 24 24">
-
-                <rect
-                  x="8"
-                  y="8"
-                  width="11"
-                  height="11"
-                  rx="2"/>
-
-                <path
-                  d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2"/>
-
-              </svg>
-
-              <span>
-                Copy Link
-              </span>
-
+              Copy Link
             </button>
-
-          </div>
-
-
-          <div class="curated-share-note">
-
-            Share this product on WhatsApp or copy its link directly.
 
           </div>
 
         </div>
 
       </div>
+    `;
 
+    document.body.appendChild(root);
 
-      <!-- TOAST -->
-
-      <div id="curated-share-toast">
-        Link copied
-      </div>
-
-    </div>
-
-  `;
-
-
-  document.body.appendChild(root);
-
-
-  /* =========================================================
-     ELEMENTS
-     ========================================================= */
-
-  var currentList = [];
-
-  var currentIndex = 0;
-
-
-  var titleEl =
-    document.getElementById('curated-title');
-
-  var descEl =
-    document.getElementById('curated-desc');
-
-  var imgEl =
-    document.getElementById('curated-img');
-
-  var linkEl =
-    document.getElementById('curated-link');
-
-  var navEl =
-    document.getElementById('curated-nav');
-
-  var stage =
-    document.getElementById('curated-stage');
-
-  var shareOverlay =
-    document.getElementById('curated-share-overlay');
-
-
-  /* =========================================================
-     HASH
-     ========================================================= */
-
-  function hashString(str) {
-
-    var h = 5381;
-
-    for (
-      var i = 0;
-      i < str.length;
-      i++
-    ) {
-
-      h =
-        ((h << 5) +
-          h +
-          str.charCodeAt(i)) >>> 0;
-
-    }
-
-    return h.toString(36);
+    return root;
   }
 
 
   /* =========================================================
-     STABLE PRODUCT ID
+     NORMALIZE PRODUCT
      ========================================================= */
 
-  function buildStableId(
-    item,
-    title,
-    url
-  ) {
+  function normalizeProduct(item, index) {
 
-    var explicitId =
-      item.id ||
-      item.product_id ||
-      item.productId ||
-      item.asin ||
-      item.ASIN ||
-      '';
-
-    if (explicitId) {
-      return String(explicitId).trim();
-    }
-
-
-    var asin =
-      String(url).match(
-        /(?:prodsku=|\/dp\/|\/gp\/product\/)([A-Z0-9]{10})/i
-      );
-
-
-    if (asin) {
-      return asin[1].toUpperCase();
-    }
-
-
-    return 'p' +
-      hashString(
-        title + '|' + url
-      );
-  }
-
-
-  /* =========================================================
-     NORMALIZE
-     ========================================================= */
-
-  function normalize(item) {
-
-    if (
-      !item ||
-      typeof item !== 'object'
-    ) {
-      return null;
-    }
-
-
-    var image =
-      item.image ||
-      item.img ||
-      item.photo ||
-      item.imageUrl ||
-      item.image_url ||
-      '';
-
-
-    var title =
-      item.title ||
-      item.text ||
-      item.name ||
-      '';
-
-
-    var desc =
-      item.description ||
-      item.desc ||
-      '';
-
-
-    var url =
-      item.url ||
-      item.affiliate ||
-      item.affiliateUrl ||
-      item.affiliate_url ||
-      item.link ||
-      '#';
-
-
-    if (
-      !title &&
-      !image
-    ) {
-      return null;
-    }
-
-
-    title =
-      String(
-        title ||
-        "Featured Product"
-      );
-
-
-    url =
-      String(url);
-
+    item = item || {};
 
     return {
-
-      id:
-        buildStableId(
-          item,
-          title,
-          url
-        ),
+      id: item.id || ("product-" + (index + 1)),
 
       title:
-        title,
+        item.title ||
+        item.name ||
+        "Mirzala Product",
 
-      desc:
-        String(desc || ""),
+      description:
+        item.description ||
+        item.desc ||
+        "Discover this selected product through Mirzala Pulse.",
 
-      img:
-        (
-          typeof image === 'string' &&
-          image.trim() !== ""
-        )
-          ? image.trim()
-          : FALLBACK_IMG,
+      image:
+        item.image ||
+        item.image_url ||
+        item.img ||
+        FALLBACK_IMG,
+
+      price:
+        item.price ||
+        "",
+
+      category:
+        item.category ||
+        "Featured",
 
       url:
-        url
-    };
+        item.url ||
+        item.link ||
+        "#",
 
+      affiliate:
+        item.affiliate !== false
+    };
   }
 
 
   /* =========================================================
-     URL PRODUCT PARAMETER
+     PRODUCT ID FROM URL
      ========================================================= */
 
-  function checkUrlProductParam() {
+  function getProductIdFromURL() {
 
-    var urlParams =
-      new URLSearchParams(
+    try {
+
+      var params = new URLSearchParams(
         window.location.search
       );
 
+      return params.get("product_id");
 
-    var targetId =
-      urlParams.get('product_id') ||
-      urlParams.get('id');
+    } catch (e) {
 
-
-    if (
-      targetId &&
-      currentList.length > 0
-    ) {
-
-      var foundIdx =
-        currentList.findIndex(
-          function (p) {
-            return p.id === targetId;
-          }
-        );
-
-
-      if (foundIdx !== -1) {
-
-        currentIndex =
-          foundIdx;
-
-      }
+      return null;
 
     }
-
   }
+
+
+  /* =========================================================
+     STATE
+     ========================================================= */
+
+  var currentIndex = 0;
 
 
   /* =========================================================
      RENDER
      ========================================================= */
 
-  function render(idx) {
+  function renderProduct(index) {
 
-    if (
-      !currentList ||
-      currentList.length === 0
-    ) {
+    if (!products.length) {
       return;
     }
 
+    if (index < 0) {
+      index = products.length - 1;
+    }
 
-    if (
-      idx >= currentList.length
-    ) {
+    if (index >= products.length) {
+      index = 0;
+    }
 
-      currentIndex = 0;
+    currentIndex = index;
+
+    var product = products[currentIndex];
+
+    var image =
+      document.getElementById("curated-product-image");
+
+    var title =
+      document.getElementById("curated-title");
+
+    var description =
+      document.getElementById("curated-description");
+
+    var price =
+      document.getElementById("curated-price");
+
+    var category =
+      document.getElementById("curated-category");
+
+    var cta =
+      document.getElementById("curated-cta");
+
+    var counter =
+      document.getElementById("curated-counter");
+
+
+    if (image) {
+
+      image.src =
+        product.image || FALLBACK_IMG;
+
+      image.alt =
+        product.title;
 
     }
 
 
-    if (idx < 0) {
+    if (title) {
+      title.textContent =
+        product.title;
+    }
 
-      currentIndex =
-        currentList.length - 1;
+
+    if (description) {
+      description.textContent =
+        product.description;
+    }
+
+
+    if (category) {
+
+      category.textContent =
+        String(product.category).toUpperCase();
 
     }
 
 
-    var p =
-      currentList[currentIndex];
+    if (price) {
+
+      if (product.price) {
+
+        price.textContent =
+          product.price;
+
+        price.style.display =
+          "block";
+
+      } else {
+
+        price.textContent = "";
+
+        price.style.display =
+          "none";
+
+      }
+
+    }
 
 
-    titleEl.textContent =
-      p.title;
+    if (cta) {
+
+      cta.href =
+        product.url || "#";
+
+      cta.textContent =
+        "VIEW PRODUCT";
+
+    }
 
 
-    descEl.textContent =
-      p.desc;
+    if (counter) {
 
+      counter.textContent =
+        (currentIndex + 1) +
+        " / " +
+        products.length;
 
-    descEl.style.display =
-      p.desc
-        ? '-webkit-box'
-        : 'none';
-
-
-    imgEl.src =
-      p.img;
-
-
-    imgEl.onerror =
-      function () {
-
-        if (
-          imgEl.src !== FALLBACK_IMG
-        ) {
-
-          imgEl.src =
-            FALLBACK_IMG;
-
-        }
-
-      };
-
-
-    linkEl.href =
-      p.url;
+    }
 
   }
 
 
   /* =========================================================
-     SHARE URL
+     SMART SHARE URL
      ========================================================= */
 
-  function getSmartProductUrl() {
+  function getShareURL() {
 
-    if (
-      !currentList ||
-      !currentList[currentIndex]
-    ) {
+    var product =
+      products[currentIndex];
 
+    if (!product) {
       return window.location.href;
-
     }
 
+    var base =
+      window.location.origin +
+      window.location.pathname;
 
-    var url =
-      new URL(
-        window.location.href
-      );
-
-
-    url.searchParams.delete('id');
-
-
-    url.searchParams.set(
-      'product_id',
-      currentList[currentIndex].id
+    return (
+      base +
+      "?product_id=" +
+      encodeURIComponent(product.id)
     );
-
-
-    url.hash = '';
-
-
-    return url.toString();
 
   }
 
@@ -747,11 +442,22 @@
 
   function openSharePanel() {
 
-    shareOverlay.classList.add('show');
+    var panel =
+      document.getElementById(
+        "curated-share-panel"
+      );
 
-    shareOverlay.setAttribute(
-      'aria-hidden',
-      'false'
+    if (!panel) {
+      return;
+    }
+
+    panel.setAttribute(
+      "aria-hidden",
+      "false"
+    );
+
+    panel.classList.add(
+      "active"
     );
 
   }
@@ -759,254 +465,131 @@
 
   function closeSharePanel() {
 
-    shareOverlay.classList.remove('show');
-
-    shareOverlay.setAttribute(
-      'aria-hidden',
-      'true'
-    );
-
-  }
-
-
-  /* =========================================================
-     SHARE TOAST
-     ========================================================= */
-
-  function showShareToast(message) {
-
-    var toast =
+    var panel =
       document.getElementById(
-        'curated-share-toast'
+        "curated-share-panel"
       );
 
+    if (!panel) {
+      return;
+    }
 
-    toast.textContent =
-      message;
-
-
-    toast.classList.add(
-      'show'
+    panel.setAttribute(
+      "aria-hidden",
+      "true"
     );
 
-
-    clearTimeout(
-      window.__mirzalaShareToastTimer
+    panel.classList.remove(
+      "active"
     );
-
-
-    window.__mirzalaShareToastTimer =
-      setTimeout(
-        function () {
-
-          toast.classList.remove(
-            'show'
-          );
-
-        },
-        1800
-      );
 
   }
 
 
   /* =========================================================
-     FALLBACK COPY
+     SHARE
      ========================================================= */
 
-  function fallbackCopyText(
-    text,
-    success
-  ) {
+  function shareCurrentProduct() {
 
-    var ta =
-      document.createElement(
-        'textarea'
-      );
+    var shareURL =
+      getShareURL();
 
+    var product =
+      products[currentIndex];
 
-    ta.value =
-      text;
-
-
-    ta.setAttribute(
-      'readonly',
-      ''
-    );
+    var shareTitle =
+      product
+        ? product.title
+        : "Mirzala Pulse";
 
 
-    ta.style.cssText =
-      'position:fixed;' +
-      'left:-10000px;' +
-      'top:0;' +
-      'width:1px;' +
-      'height:1px;' +
-      'opacity:0;' +
-      'user-select:text;' +
-      '-webkit-user-select:text;';
+    if (
+      navigator.share
+    ) {
 
+      navigator.share({
 
-    document.body.appendChild(
-      ta
-    );
+        title:
+          shareTitle,
 
+        text:
+          "Discover this product on Mirzala Pulse.",
 
-    ta.focus();
+        url:
+          shareURL
 
-    ta.select();
+      }).catch(function () {});
 
-    ta.setSelectionRange(
-      0,
-      ta.value.length
-    );
-
-
-    var copied = false;
-
-
-    try {
-
-      copied =
-        document.execCommand(
-          'copy'
-        );
-
-    } catch (err) {
-
-      copied = false;
-
+      return;
     }
 
 
-    document.body.removeChild(
-      ta
+    openSharePanel();
+
+  }
+
+
+  /* =========================================================
+     WHATSAPP
+     ========================================================= */
+
+  function shareWhatsApp() {
+
+    var url =
+      getShareURL();
+
+    var text =
+      "Check this out on Mirzala Pulse: " +
+      url;
+
+    window.open(
+      "https://wa.me/?text=" +
+      encodeURIComponent(text),
+      "_blank"
     );
 
+  }
 
-    if (copied) {
 
-      success();
+  /* =========================================================
+     COPY LINK
+     ========================================================= */
+
+  function copyShareLink() {
+
+    var url =
+      getShareURL();
+
+
+    if (
+      navigator.clipboard &&
+      navigator.clipboard.writeText
+    ) {
+
+      navigator.clipboard
+        .writeText(url)
+        .then(function () {
+
+          alert(
+            "Link copied."
+          );
+
+        })
+        .catch(function () {
+
+          window.prompt(
+            "Copy this link:",
+            url
+          );
+
+        });
 
     } else {
 
       window.prompt(
-        'Copy link:',
-        text
-      );
-
-    }
-
-  }
-
-
-  /* =========================================================
-     COPY
-     ========================================================= */
-
-  function copyText(
-    text,
-    message
-  ) {
-
-    function success() {
-
-      showShareToast(
-        message ||
-        'Link copied'
-      );
-
-    }
-
-
-    try {
-
-      if (
-        navigator.clipboard &&
-        typeof navigator.clipboard.writeText ===
-          'function'
-      ) {
-
-        navigator.clipboard
-          .writeText(text)
-          .then(success)
-          .catch(
-            function () {
-
-              fallbackCopyText(
-                text,
-                success
-              );
-
-            }
-          );
-
-        return;
-      }
-
-    } catch (err) {}
-
-
-    fallbackCopyText(
-      text,
-      success
-    );
-
-  }
-
-
-  /* =========================================================
-     SHARE HANDLER
-     ========================================================= */
-
-  function handleShare(type) {
-
-    var product =
-      currentList[currentIndex];
-
-
-    if (!product) {
-      return;
-    }
-
-
-    var smartUrl =
-      getSmartProductUrl();
-
-
-    if (
-      type === 'whatsapp'
-    ) {
-
-      var text =
-        product.title +
-        ' - ' +
-        smartUrl;
-
-
-      window.open(
-        'https://wa.me/?text=' +
-        encodeURIComponent(text),
-
-        '_blank',
-
-        'noopener,noreferrer'
-      );
-
-
-      closeSharePanel();
-
-      return;
-
-    }
-
-
-    if (
-      type === 'copy'
-    ) {
-
-      copyText(
-        smartUrl,
-        'Link copied'
+        "Copy this link:",
+        url
       );
 
     }
@@ -1018,460 +601,434 @@
      NAVIGATION
      ========================================================= */
 
-  function go(step) {
+  function nextProduct() {
 
-    if (
-      currentList.length < 2
-    ) {
-      return;
-    }
+    renderProduct(
+      currentIndex + 1
+    );
 
-
-    currentIndex =
-      (
-        currentIndex +
-        step +
-        currentList.length
-      ) %
-      currentList.length;
+  }
 
 
-    render(
-      currentIndex
+  function previousProduct() {
+
+    renderProduct(
+      currentIndex - 1
     );
 
   }
 
 
   /* =========================================================
-     INITIALIZE
+     INIT EVENTS
      ========================================================= */
 
-  function init(rawList) {
+  function initEvents() {
 
-    currentList =
-      rawList
-        .map(normalize)
-        .filter(
-          function (p) {
-            return p;
-          }
-        );
+    var next =
+      document.getElementById(
+        "curated-next"
+      );
+
+    var prev =
+      document.getElementById(
+        "curated-prev"
+      );
+
+    var share =
+      document.getElementById(
+        "curated-share"
+      );
+
+    var closeShare =
+      document.getElementById(
+        "curated-share-close"
+      );
+
+    var whatsapp =
+      document.getElementById(
+        "curated-whatsapp"
+      );
+
+    var copy =
+      document.getElementById(
+        "curated-copy"
+      );
+
+    var home =
+      document.getElementById(
+        "curated-home"
+      );
 
 
-    if (
-      currentList.length === 0
-    ) {
+    if (next) {
 
-      titleEl.textContent =
-        "No products found";
-
-
-      descEl.textContent =
-        "Please add products to the list.";
-
-
-      navEl.style.display =
-        'none';
-
-
-      return;
+      next.addEventListener(
+        "click",
+        nextProduct
+      );
 
     }
 
 
-    var single =
-      currentList.length < 2;
+    if (prev) {
+
+      prev.addEventListener(
+        "click",
+        previousProduct
+      );
+
+    }
 
 
-    document.getElementById(
-      'ctrl-up'
-    ).style.display =
-      single
-        ? 'none'
-        : 'flex';
+    if (share) {
+
+      share.addEventListener(
+        "click",
+        shareCurrentProduct
+      );
+
+    }
 
 
-    document.getElementById(
-      'ctrl-down'
-    ).style.display =
-      single
-        ? 'none'
-        : 'flex';
+    if (closeShare) {
+
+      closeShare.addEventListener(
+        "click",
+        closeSharePanel
+      );
+
+    }
 
 
-    window.MirzalaProductDatabase =
-      currentList;
+    if (whatsapp) {
+
+      whatsapp.addEventListener(
+        "click",
+        shareWhatsApp
+      );
+
+    }
 
 
-    checkUrlProductParam();
+    if (copy) {
+
+      copy.addEventListener(
+        "click",
+        copyShareLink
+      );
+
+    }
 
 
-    render(
-      currentIndex
-    );
+    if (home) {
 
-  }
-
-
-  /* =========================================================
-     LOAD PRODUCTS
-     ========================================================= */
-
-  if (JSON_URL) {
-
-    fetch(
-      JSON_URL +
-      '?t=' +
-      new Date().getTime()
-    )
-
-      .then(
-        function (response) {
-          return response.json();
-        }
-      )
-
-      .then(
-        function (data) {
-
-          var extra =
-            Array.isArray(data)
-              ? data
-              : (
-                  data &&
-                  data.products
-                    ? data.products
-                    : []
-                );
-
-
-          init(
-            MIRZALA_PRODUCTS.concat(
-              extra
-            )
-          );
-
-        }
-      )
-
-      .catch(
+      home.addEventListener(
+        "click",
         function () {
 
-          init(
-            MIRZALA_PRODUCTS
-          );
+          window.location.href =
+            "/";
 
         }
       );
 
-  } else {
+    }
 
-    init(
-      MIRZALA_PRODUCTS
+
+    /* Keyboard */
+
+    document.addEventListener(
+      "keydown",
+      function (event) {
+
+        if (
+          event.key === "ArrowDown" ||
+          event.key === "ArrowRight"
+        ) {
+
+          nextProduct();
+
+        }
+
+        if (
+          event.key === "ArrowUp" ||
+          event.key === "ArrowLeft"
+        ) {
+
+          previousProduct();
+
+        }
+
+        if (
+          event.key === "Escape"
+        ) {
+
+          closeSharePanel();
+
+        }
+
+      }
     );
+
+
+    /* Mouse wheel */
+
+    var stage =
+      document.getElementById(
+        "curated-stage"
+      );
+
+    if (stage) {
+
+      stage.addEventListener(
+        "wheel",
+        function (event) {
+
+          if (
+            Math.abs(event.deltaY) < 20
+          ) {
+            return;
+          }
+
+          if (
+            event.deltaY > 0
+          ) {
+
+            nextProduct();
+
+          } else {
+
+            previousProduct();
+
+          }
+
+        },
+        {
+          passive: true
+        }
+      );
+
+    }
+
+
+    /* Touch swipe */
+
+    var touchStartY =
+      null;
+
+    if (stage) {
+
+      stage.addEventListener(
+        "touchstart",
+        function (event) {
+
+          if (
+            event.touches &&
+            event.touches.length
+          ) {
+
+            touchStartY =
+              event.touches[0].clientY;
+
+          }
+
+        },
+        {
+          passive: true
+        }
+      );
+
+
+      stage.addEventListener(
+        "touchend",
+        function (event) {
+
+          if (
+            touchStartY === null
+          ) {
+            return;
+          }
+
+          var touchEndY =
+            event.changedTouches[0].clientY;
+
+          var difference =
+            touchStartY -
+            touchEndY;
+
+
+          if (
+            Math.abs(difference) > 50
+          ) {
+
+            if (
+              difference > 0
+            ) {
+
+              nextProduct();
+
+            } else {
+
+              previousProduct();
+
+            }
+
+          }
+
+
+          touchStartY =
+            null;
+
+        },
+        {
+          passive: true
+        }
+      );
+
+    }
 
   }
 
 
   /* =========================================================
-     HOME
+     LOAD JSON
      ========================================================= */
 
-  document
-    .getElementById(
-      'curated-home-btn'
-    )
-    .addEventListener(
-      'click',
-      function (e) {
+  function loadProducts() {
 
-        e.stopPropagation();
+    if (!JSON_URL) {
 
-        window.location.href =
-          'https://www.mirzala.com/';
+      finishInit();
 
-      }
-    );
-
-
-  /* =========================================================
-     NAV BUTTONS
-     ========================================================= */
-
-  document
-    .getElementById(
-      'ctrl-up'
-    )
-    .addEventListener(
-      'click',
-      function (e) {
-
-        e.stopPropagation();
-
-        go(-1);
-
-      }
-    );
-
-
-  document
-    .getElementById(
-      'ctrl-down'
-    )
-    .addEventListener(
-      'click',
-      function (e) {
-
-        e.stopPropagation();
-
-        go(1);
-
-      }
-    );
-
-
-  /* =========================================================
-     SHARE
-     ========================================================= */
-
-  document
-    .getElementById(
-      'curated-share-btn'
-    )
-    .addEventListener(
-      'click',
-      function (e) {
-
-        e.stopPropagation();
-
-        openSharePanel();
-
-      }
-    );
-
-
-  document
-    .getElementById(
-      'curated-share-close'
-    )
-    .addEventListener(
-      'click',
-      function (e) {
-
-        e.stopPropagation();
-
-        closeSharePanel();
-
-      }
-    );
-
-
-  shareOverlay.addEventListener(
-    'click',
-    function (e) {
-
-      if (
-        e.target ===
-        shareOverlay
-      ) {
-
-        closeSharePanel();
-
-      }
+      return;
 
     }
-  );
 
 
-  shareOverlay
-    .querySelectorAll(
-      '[data-share]'
-    )
-    .forEach(
-      function (btn) {
+    fetch(JSON_URL)
 
-        btn.addEventListener(
-          'click',
-          function (e) {
+      .then(function (response) {
 
-            e.stopPropagation();
+        if (!response.ok) {
+          throw new Error(
+            "JSON request failed"
+          );
+        }
 
-            handleShare(
-              btn.getAttribute(
-                'data-share'
-              )
+        return response.json();
+
+      })
+
+      .then(function (data) {
+
+        if (
+          Array.isArray(data) &&
+          data.length
+        ) {
+
+          products =
+            data.map(
+              normalizeProduct
+            );
+
+        }
+
+        finishInit();
+
+      })
+
+      .catch(function () {
+
+        finishInit();
+
+      });
+
+  }
+
+
+  /* =========================================================
+     FINISH
+     ========================================================= */
+
+  function finishInit() {
+
+    var root =
+      createRoot();
+
+
+    if (!root) {
+      return;
+    }
+
+
+    /* Normalize fallback products */
+
+    products =
+      products.map(
+        normalizeProduct
+      );
+
+
+    /* URL product */
+
+    var requestedID =
+      getProductIdFromURL();
+
+
+    if (requestedID) {
+
+      var foundIndex =
+        products.findIndex(
+          function (product) {
+
+            return (
+              product.id ===
+              requestedID
             );
 
           }
         );
 
+
+      if (foundIndex >= 0) {
+
+        currentIndex =
+          foundIndex;
+
       }
+
+    }
+
+
+    renderProduct(
+      currentIndex
     );
 
 
-  /* =========================================================
-     TOUCH / SWIPE
-     ========================================================= */
+    initEvents();
 
-  var startY = 0;
-
-
-  stage.addEventListener(
-    'touchstart',
-    function (e) {
-
-      if (
-        e.touches &&
-        e.touches.length
-      ) {
-
-        startY =
-          e.touches[0].clientY;
-
-      }
-
-    },
-    {
-      passive: true
-    }
-  );
-
-
-  stage.addEventListener(
-    'touchend',
-    function (e) {
-
-      if (
-        shareOverlay.classList.contains(
-          'show'
-        )
-      ) {
-        return;
-      }
-
-
-      if (
-        !e.changedTouches ||
-        !e.changedTouches.length
-      ) {
-        return;
-      }
-
-
-      var diffY =
-        e.changedTouches[0].clientY -
-        startY;
-
-
-      if (diffY < -30) {
-
-        go(1);
-
-      } else if (diffY > 30) {
-
-        go(-1);
-
-      }
-
-    },
-    {
-      passive: true
-    }
-  );
+  }
 
 
   /* =========================================================
-     MOUSE WHEEL
+     START
      ========================================================= */
 
-  stage.addEventListener(
-    'wheel',
-    function (e) {
+  if (
+    document.readyState ===
+    "loading"
+  ) {
 
-      e.preventDefault();
+    document.addEventListener(
+      "DOMContentLoaded",
+      loadProducts
+    );
 
+  } else {
 
-      if (
-        shareOverlay.classList.contains(
-          'show'
-        )
-      ) {
-        return;
-      }
+    loadProducts();
 
-
-      if (e.deltaY > 15) {
-
-        go(1);
-
-      } else if (e.deltaY < -15) {
-
-        go(-1);
-
-      }
-
-    },
-    {
-      passive: false
-    }
-  );
-
-
-  /* =========================================================
-     KEYBOARD
-     ========================================================= */
-
-  window.addEventListener(
-    'keydown',
-    function (e) {
-
-      if (
-        e.key === 'Escape'
-      ) {
-
-        closeSharePanel();
-
-        return;
-
-      }
-
-
-      if (
-        shareOverlay.classList.contains(
-          'show'
-        )
-      ) {
-
-        return;
-
-      }
-
-
-      if (
-        e.key === 'ArrowDown' ||
-        e.key === 'PageDown'
-      ) {
-
-        e.preventDefault();
-
-        go(1);
-
-      }
-
-      else if (
-        e.key === 'ArrowUp' ||
-        e.key === 'PageUp'
-      ) {
-
-        e.preventDefault();
-
-        go(-1);
-
-      }
-
-    }
-  );
-
+  }
 
 })();
